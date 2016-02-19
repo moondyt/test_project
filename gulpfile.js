@@ -1,11 +1,78 @@
 /*global -$ */
 'use strict';
 
-var gulp = require('gulp');
-
-gulp.task('task-name', function() {
-    console.log('Hello, Gulp!'); 
+var gulp = require('gulp'),
+    connect = require('gulp-connect'),
+    $ = require('gulp-load-plugins')();
+ 
+gulp.task('webserver', function() {
+    connect.server({
+      livereload: true
+    });
 });
+
+gulp.task('jshint', function () {
+  return gulp.src('scripts/**/*.js')
+    .pipe($.jshint())
+    .pipe($.jshint.reporter('jshint-stylish'))
+    .pipe(gulp.dest('.tmp/scripts'));
+    // .pipe($.if(!browserSync.active, $.jshint.reporter('fail')));
+});
+
+
+// 定义 scss 任务
+gulp.task('scss', function() {
+    gulp.src('styles/main.scss')
+        .pipe($.sass())
+        .pipe(gulp.dest('.tmp/styles'))
+        .pipe(connect.reload());
+});
+
+
+
+// 定义 watch 任务
+gulp.task('watch', function() {
+    gulp.watch('styles/*.scss', ['scss']);
+    gulp.watch('scripts/*.js', ['jshint']);
+})
+ 
+gulp.task('default', ['webserver','jshint','scss','watch']);
+
+// var gulp = require('gulp');
+
+// gulp.task('task-name', function() {
+//     console.log('Hello, Gulp!'); 
+// });
+
+// gulp.task('clean', function () {
+//   require('del').bind(null, ['.tmp', 'dist/*']);
+// });
+
+// gulp.task('serve', ['styles', 'fonts'], function () {
+//   browserSync({
+//     notify: false,
+//     port: 9000,
+//     server: {
+//       baseDir: ['.tmp', 'app'],
+//       routes: {
+//         '/bower_components': 'bower_components'
+//       }
+//     }
+//   });
+
+//   // watch for changes
+//   gulp.watch([
+//     'app/*.html',
+//     '.tmp/styles/**/*.css',
+//     'app/scripts/**/*.js',
+//     'app/images/**/*'
+//   ]).on('change', reload);
+
+//   gulp.watch('app/styles/**/*.scss', ['styles', reload]);
+//   gulp.watch('bower.json', ['wiredep', 'fonts', reload]);
+// });
+
+
 
 
 // generated on <%= (new Date).toISOString().split('T')[0] %> using <%= pkg.name %> <%= pkg.version %>
